@@ -1,0 +1,106 @@
+<script src="https://home.et.utwente.nl/slootenvanf/div/processing.min.js"></script>
+<script type="application/processing" data-processing-target="pjs">
+
+int MAX = 100;
+int endScore = 5;
+
+float ballX[] = new float[MAX];
+float ballY[] = new float[MAX];
+float speedX[] = new float[MAX];
+float speedY[] = new float[MAX]; 
+float paddle1Y[] = new float[MAX];
+float paddle2Y[] = new float[MAX];
+
+int ballNum = 0;
+int p1Score = 0;
+int p2Score = 0;
+
+void setup(){
+   size(500, 300);
+
+   for(int i = 0; i < MAX; i++){
+      ballX[i] = 250;
+      ballY[i] = 150;
+      speedX[i] = random(-3, 1)+2;
+      speedY[i] = random(-3, 1)+2;
+      paddle1Y[i] = height/2;
+      paddle2Y[i] = height/2;
+   }
+}
+
+void draw(){
+  background(0);
+
+  //Repeat till MAX score is reached
+  if(p1Score < endScore && p2Score < endScore){
+    /*Keep paddle position*/
+    paddle2Y[ballNum+1] = paddle2Y[ballNum]; 
+    paddle1Y[ballNum+1] = paddle1Y[ballNum];
+
+    /*Draw*/
+    //Middle Line
+    fill(255);
+    rect(width/2, -1, 5, 100000);
+    //Paddle 1
+    rect(30, paddle1Y[ballNum], 10, 30);
+    //Draw Paddle 2
+    rect(460, paddle2Y[ballNum], 10, 30);
+    //Ball
+    fill(255);
+    ellipse(ballX[ballNum], ballY[ballNum], 10, 10);
+    ballX[ballNum] += speedX[ballNum];
+    ballY[ballNum] += speedY[ballNum];
+
+    /*Movement for paddles*/
+    //Player 1 Paddle Movement
+    if(keyPressed){
+      if(key == 'w'){
+        paddle1Y[ballNum] -= 2; 
+      }
+      if(key == 's'){
+        paddle1Y[ballNum] += 2;
+      }
+    }
+    //Player 2 Paddle Movement
+    if(paddle2Y[ballNum] > ballY[ballNum]){
+      paddle2Y[ballNum] -= 1;
+    }else if(paddle2Y[ballNum] < ballY[ballNum]){
+      paddle2Y[ballNum] += 1;
+    }
+
+    /*Display player scores*/
+    textSize(26);
+    text(p1Score, 150, 25);
+    textSize(26);
+    text(p2Score, 350, 25);
+    //Score and ball tracker
+    if(ballX[ballNum] < 0){
+      p2Score++;
+      ballNum++;
+    }else if(ballX[ballNum] > width){
+      p1Score++;
+      ballNum++;
+    }
+
+    /*Bounce Ball*/ 
+    //Off paddles
+    if((ballY[ballNum] <= paddle1Y[ballNum]+30 && ballY[ballNum] >= paddle1Y[ballNum]-0) && (ballX[ballNum] > 30 && ballX[ballNum] < 40)){
+      speedX[ballNum] *= -1;
+      speedX[ballNum]++;
+    }
+    if((ballY[ballNum] <= paddle2Y[ballNum]+30 && ballY[ballNum] >= paddle2Y[ballNum]-0) && (ballX[ballNum] > 455 && ballX[ballNum] < 465)){
+      speedX[ballNum] *= -1;
+      speedX[ballNum]--;
+    }
+    //Top and Bottom
+    if(ballY[ballNum] < 0 || ballY[ballNum] > height){
+      speedY[ballNum] *= -1;
+    }
+  }
+  /*End Screen*/
+  if(p1Score >= endScore || p2Score >= endScore){
+    text("GAME OVER", width/2, height/2);
+  }
+}
+
+</script><canvas id="pjs"></canvas>
